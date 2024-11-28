@@ -10,6 +10,7 @@ from metagpt.roles.role import Role
 from metagpt.roles.architect import Architect
 from metagpt.roles.project_manager import ProjectManager
 from metagpt.roles.product_manager import ProductManager
+from metagpt.roles.product_manager_1 import ProductManager1
 from metagpt.roles.engineer import Engineer
 from metagpt.roles.qa_engineer import QaEngineer
 from metagpt.roles.searcher import Searcher
@@ -20,6 +21,7 @@ __all__ = [
     "Role",
     "Architect",
     "ProjectManager",
+    "ProductManager1",
     "ProductManager",
     "Engineer",
     "QaEngineer",

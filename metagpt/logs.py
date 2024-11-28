@@ -15,7 +15,7 @@ from loguru import logger as _logger
 from metagpt.const import METAGPT_ROOT
 
 
-def define_log_level(print_level="INFO", logfile_level="DEBUG", name: str = None):
+def define_log_level(print_level="DEBUG", logfile_level="DEBUG", name: str = None):
     """Adjust the log level to above level"""
     current_date = datetime.now()
     formatted_date = current_date.strftime("%Y%m%d")

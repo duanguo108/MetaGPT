@@ -106,21 +106,23 @@ COMPETITIVE_QUADRANT_CHART = ActionNode(
     key="Competitive Quadrant Chart",
     expected_type=str,
     instruction="Use mermaid quadrantChart syntax. Distribute scores evenly between 0 and 1",
-    example="""quadrantChart
-    title "Reach and engagement of campaigns"
-    x-axis "Low Reach" --> "High Reach"
-    y-axis "Low Engagement" --> "High Engagement"
-    quadrant-1 "We should expand"
-    quadrant-2 "Need to promote"
-    quadrant-3 "Re-evaluate"
-    quadrant-4 "May be improved"
-    "Campaign A": [0.3, 0.6]
-    "Campaign B": [0.45, 0.23]
-    "Campaign C": [0.57, 0.69]
-    "Campaign D": [0.78, 0.34]
-    "Campaign E": [0.40, 0.34]
-    "Campaign F": [0.35, 0.78]
-    "Our Target Product": [0.5, 0.6]""",
+    # example="""quadrantChart
+    # title "Reach and engagement of campaigns"
+    # x-axis "Low Reach" --> "High Reach"
+    # y-axis "Low Engagement" --> "High Engagement"
+    # quadrant-1 "We should expand"
+    # quadrant-2 "Need to promote"
+    # quadrant-3 "Re-evaluate"
+    # quadrant-4 "May be improved"
+    # "Campaign A": [0.3, 0.6]
+    # "Campaign B": [0.45, 0.23]
+    # "Campaign C": [0.57, 0.69]
+    # "Campaign D": [0.78, 0.34]
+    # "Campaign E": [0.40, 0.34]
+    # "Campaign F": [0.35, 0.78]
+    # "Our Target Product": [0.5, 0.6]""",
+
+    example="",
 )
 
 REQUIREMENT_ANALYSIS = ActionNode(
@@ -186,6 +188,11 @@ REASON = ActionNode(
     key="reason", expected_type=str, instruction="Explain the reasoning process from question to answer", example="..."
 )
 
+Function_Module_Design = ActionNode(key="Function Module Design"
+                                    ,expected_type=List[List[str]]
+                                    ,instruction="Complete the functional module design according to the requirements,and add A brief introduction of the module in info "
+                                    ,example=[["...","info...."],["...","info..."]])
+
 
 NODES = [
     LANGUAGE,
@@ -198,6 +205,7 @@ NODES = [
     COMPETITIVE_QUADRANT_CHART,
     REQUIREMENT_ANALYSIS,
     REQUIREMENT_POOL,
+    Function_Module_Design,
     UI_DESIGN_DRAFT,
     ANYTHING_UNCLEAR,
 ]

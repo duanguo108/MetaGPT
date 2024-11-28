@@ -25,11 +25,16 @@ from metagpt.actions.write_test import WriteTest
 from metagpt.actions.di.execute_nb_code import ExecuteNbCode
 from metagpt.actions.di.write_analysis_code import WriteAnalysisCode
 from metagpt.actions.di.write_plan import WritePlan
+from metagpt.actions.ddl_check import DDLCheck
+from metagpt.actions.topic_management import Topic_Summary
+
 
 
 class ActionType(Enum):
     """All types of Actions, used for indexing."""
 
+    DDLCheck = DDLCheck
+    Topic_Summary = Topic_Summary
     ADD_REQUIREMENT = UserRequirement
     WRITE_PRD = WritePRD
     WRITE_PRD_REVIEW = WritePRDReview

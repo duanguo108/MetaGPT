@@ -154,6 +154,7 @@ allure-results
 
 key.yaml
 /data/
+/workspace/
 data.ms
 examples/nb/
 examples/default__vector_store.json

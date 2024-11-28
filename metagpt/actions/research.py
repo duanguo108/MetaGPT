@@ -136,6 +136,20 @@ class CollectLinks(Action):
         model_name = config.llm.model
         prompt = reduce_message_length(gen_msg(), model_name, system_text, config.llm.max_token)
         logger.debug(prompt)
+        # Lambert：大模型拆分问题
+        '''
+        ### Requirements
+        1. The keywords related to your research topic and the search results are shown in the "Search Result Information" section.
+        2. Provide up to 1 queries related to your research topic base on the search results.
+        3. Please respond in the following JSON format: ["query1", "query2", "query3", ...].
+        
+        ### Search Result Information
+        #### Keyword: MySQL
+         Search Result: [{'title': 'MySQL', 'link': 'https://www.mysql.com/', 'snippet': 'MySQL Cluster enables users to meet the database challenges of next generation web, cloud, and communications services with uncompromising scalability, uptime ...'}, {'title': 'MySQL', 'link': 'https://en.wikipedia.org/wiki/MySQL', 'snippet': 'MySQL is free and open-source software under the terms of the GNU General Public License, and is also available under a variety of proprietary licenses. MySQL ...'}, {'title': 'MySQL Tutorial', 'link': 'https://www.w3schools.com/MySQL/default.asp', 'snippet': 'MySQL is a widely used relational database management system (RDBMS). MySQL is free and open-source. MySQL is ideal for both small and large applications.'}, {'title': 'MySQL', 'link': 'https://github.com/mysql', 'snippet': "MySQL Server, the world's most popular open source database, and MySQL Cluster, a real-time, open source transactional database."}]
+        
+        #### Keyword: Oracle
+         Search Result: [{'title': 'Oracle | Cloud Applications and Cloud Platform', 'link': 'https://www.oracle.com/', 'snippet': 'Oracle offers a comprehensive and fully integrated stack of cloud applications and cloud platform services.'}, {'title': 'Oracle Corporation', 'link': 'https://en.wikipedia.org/wiki/Oracle_Corporation', 'snippet': 'Oracle Corporation is an American multinational computer technology company headquartered in Austin, Texas. In 2020, Oracle was the third-largest software ...'}, {'title': 'Oracle Definition & Meaning', 'link': 'https://www.merriam-webster.com/dictionary/oracle', 'snippet': 'The meaning of ORACLE is a person (such as a priestess of ancient Greece) through whom a deity is believed to speak. How to use oracle in a sentence.'}, {'title': 'Oracle', 'link': 'https://en.wikipedia.org/wiki/Oracle', 'snippet': 'An oracle is a person or thing considered to provide insight, wise counsel or prophetic predictions, most notably including precognition of the future, ...'}]
+        '''
         queries = await self._aask(prompt, [system_text])
         try:
             queries = OutputParser.extract_struct(queries, list)
@@ -160,10 +174,30 @@ class CollectLinks(Action):
             A list of ranked URLs.
         """
         max_results = max(num_results * 2, 6)
-        results = await self.search_engine.run(query, max_results=max_results, as_string=False)
+        # results = await self.search_engine.run(query, max_results=max_results, as_string=False)
+        # mock call search API
+        results = [{'title': 'Oracle vs. MySQL: Compare Syntax, Features & More', 'link': 'https://www.integrate.io/blog/oracle-vs-mysql/', 'snippet': 'The main difference between MySQL and SQL lies in their nature and usage. MySQL is an open-source database system, while SQL is a language used ...'}, {'title': '2 Oracle and MySQL Compared', 'link': 'https://docs.oracle.com/cd/E12151_01/doc.150/e12155/oracle_mysql_compared.htm', 'snippet': 'MySQL differs from Oracle in the way it handles default value for a column that does not allow NULL value. In MySQL, for a column that does not allow NULL value ...'}, {'title': 'Difference between MySQL and Oracle', 'link': 'https://www.javatpoint.com/mysql-vs-oracle', 'snippet': 'MySQL and Oracle are the two famous relational databases that are used in small and big companies. Although Oracle Corporation supports both databases, ...'}, {'title': 'Difference between Oracle and MySQL', 'link': 'https://www.geeksforgeeks.org/difference-between-oracle-and-mysql/', 'snippet': 'Difference between Oracle and MySQL · 1. It is developed By Oracle in 1980. · 2. It is commercial. · 3. Server operating systems for Oracle is ...'}, {'title': 'Differences between MySQL and Oracle databases [closed]', 'link': 'https://stackoverflow.com/questions/40356107/differences-between-mysql-and-oracle-databases', 'snippet': "In general, Oracle is much more powerful and is a deeper RDBMS, which allows you to write any complex system. That's why it is used in banking, ..."}]
         _results = "\n".join(f"{i}: {j}" for i, j in zip(range(max_results), results))
         prompt = COLLECT_AND_RANKURLS_PROMPT.format(topic=topic, query=query, results=_results)
         logger.debug(prompt)
+        '''
+        ### Topic
+        The difference between mysql and oracle
+        ### Query
+        What is MySQL and how does it differ from Oracle?
+        
+        ### The online search results
+        0: {'title': 'Oracle vs. MySQL: Compare Syntax, Features & More', 'link': 'https://www.integrate.io/blog/oracle-vs-mysql/', 'snippet': 'The main difference between MySQL and SQL lies in their nature and usage. MySQL is an open-source database system, while SQL is a language used ...'}
+        1: {'title': '2 Oracle and MySQL Compared', 'link': 'https://docs.oracle.com/cd/E12151_01/doc.150/e12155/oracle_mysql_compared.htm', 'snippet': 'MySQL differs from Oracle in the way it handles default value for a column that does not allow NULL value. In MySQL, for a column that does not allow NULL value ...'}
+        2: {'title': 'Difference between MySQL and Oracle', 'link': 'https://www.javatpoint.com/mysql-vs-oracle', 'snippet': 'MySQL and Oracle are the two famous relational databases that are used in small and big companies. Although Oracle Corporation supports both databases, ...'}
+        3: {'title': 'Difference between Oracle and MySQL', 'link': 'https://www.geeksforgeeks.org/difference-between-oracle-and-mysql/', 'snippet': 'Difference between Oracle and MySQL · 1. It is developed By Oracle in 1980. · 2. It is commercial. · 3. Server operating systems for Oracle is ...'}
+        4: {'title': 'Differences between MySQL and Oracle databases [closed]', 'link': 'https://stackoverflow.com/questions/40356107/differences-between-mysql-and-oracle-databases', 'snippet': "In general, Oracle is much more powerful and is a deeper RDBMS, which allows you to write any complex system. That's why it is used in banking, ..."}
+        
+        ### Requirements
+        Please remove irrelevant search results that are not related to the query or topic. Then, sort the remaining search results based on the link credibility. If two results have equal credibility, prioritize them based on the relevance. Provide the
+        ranked results' indices in JSON format, like [0, 1, 3, 4, ...], without including other words.
+
+        '''
         indices = await self._aask(prompt)
         try:
             indices = OutputParser.extract_struct(indices, list)
@@ -171,6 +205,7 @@ class CollectLinks(Action):
         except Exception as e:
             logger.exception(f"fail to rank results for {e}")
             indices = list(range(max_results))
+        indices = [0];
         results = [results[i] for i in indices]
         if self.rank_func:
             results = self.rank_func(results)
@@ -222,6 +257,7 @@ class WebBrowseAndSummarize(Action):
         prompt_template = WEB_BROWSE_AND_SUMMARIZE_PROMPT.format(query=query, content="{}")
         for u, content in zip([url, *urls], contents):
             content = content.inner_text
+            # content = "Difference between MySQL and Oracle";
             chunk_summaries = []
             for prompt in generate_prompt_chunk(content, prompt_template, self.llm.model, system_text, 4096):
                 logger.debug(prompt)
@@ -229,6 +265,19 @@ class WebBrowseAndSummarize(Action):
                 if summary == "Not relevant.":
                     continue
                 chunk_summaries.append(summary)
+
+            # prompt = """### Requirements
+            #             1. Utilize the text in the "Reference Information" section to respond to the question "{query}".
+            #             2. If the question cannot be directly answered using the text, but the text is related to the research topic, please provide \
+            #             a comprehensive summary of the text.
+            #             3. If the text is entirely unrelated to the research topic, please reply with a simple text "Not relevant."
+            #             4. Include all relevant factual information, numbers, statistics, etc., if available.
+            #
+            #             ### Reference Information
+            #             Difference between MySQL and Oracle
+            #             """
+            # summary = await self._aask(prompt, [system_text])
+            # chunk_summaries.append(summary)
 
             if not chunk_summaries:
                 summaries[u] = None

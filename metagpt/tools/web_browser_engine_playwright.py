@@ -58,6 +58,18 @@ class PlaywrightWrapper(BaseModel):
         page = await context.new_page()
         async with page:
             try:
+                # cookie = {
+                #         "name": "cookie-name",
+                #         "value": "cookie-value",
+                #         "domain": "example.com",  # cookie 所属的域名
+                #         "path": "/",  # cookie 的路径
+                #         "secure": False,  # 是否仅通过 HTTPS 发送
+                #         "httpOnly": False,  # 是否仅通过 HTTP 发送（脚本无法访问）
+                #         "sameSite": "None",  # SameSite 属性，注意 None 的首字母大写且值为字符串
+                #
+                #     }
+                # await page.add_cookie(cookie)
+
                 await page.goto(url)
                 await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
                 html = await page.content()

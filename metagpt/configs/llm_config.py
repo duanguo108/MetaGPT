@@ -31,6 +31,7 @@ class LLMType(Enum):
     MOONSHOT = "moonshot"
     MISTRAL = "mistral"
     YI = "yi"  # lingyiwanwu
+    P1_LLM = "p1_llm"  # p1_llm
 
     def __missing__(self, key):
         return self.OPENAI
@@ -82,6 +83,10 @@ class LLMConfig(YamlModel):
 
     # Cost Control
     calc_usage: bool = True
+
+    #p1 extend
+    authorization: str = ''
+    serviceName: str = ''
 
     @field_validator("api_key")
     @classmethod

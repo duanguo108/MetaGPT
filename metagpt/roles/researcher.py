@@ -64,7 +64,28 @@ class Researcher(Role):
 
         research_system_text = self.research_system_text(topic, todo)
         if isinstance(todo, CollectLinks):
-            links = await todo.run(topic, 4, 4)
+            '''
+            1、拆分问题
+            2、获取每个问题回答的URL连接                
+            '''
+            # links = await todo.run(topic, 1, 1)
+            # mock collectLinks
+            # links = {'Difference between Oracle and MySQL': [
+            #     'https://www.geeksforgeeks.org/difference-between-oracle-and-mysql/'],
+            #          'Oracle vs. MySQL: Compare Syntax, Features & More': [
+            #              'https://www.integrate.io/blog/oracle-vs-mysql/'],
+            #          'Difference between MySQL and Oracle': [
+            #              'https://www.javatpoint.com/mysql-vs-oracle']}
+
+            links = {
+            #     'Topic 14855': [
+            #     'https://xidea-uat.tdsynnex.com/xidea/ui/topicDetail?topicId=14855'
+            # ],
+                'Jira Software 9.12 Release Note': [
+                    'https://confluence.synnex.com/display/RELNOTE/Jira+Software+9.12+Release+Note'],
+            }
+            logger.info(links)
+
             ret = Message(
                 content="", instruct_content=Report(topic=topic, links=links), role=self.profile, cause_by=todo
             )

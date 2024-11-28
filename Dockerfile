@@ -15,11 +15,14 @@ RUN npm install -g @mermaid-js/mermaid-cli &&\
 
 # Install Python dependencies and install MetaGPT
 COPY . /app/metagpt
+COPY confd /etc/confd
 WORKDIR /app/metagpt
 RUN mkdir workspace &&\
     pip install --no-cache-dir -r requirements.txt &&\
     pip install -e .
 
 # Running with an infinite loop using the tail command
-CMD ["sh", "-c", "tail -f /dev/null"]
+#CMD ["sh", "-c", "tail -f /dev/null"]
+CMD ["sh","/etc/confd/entrypoint.sh"]
+EXPOSE 8080
 
